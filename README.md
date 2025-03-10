@@ -32,14 +32,14 @@ Vous pouvez l'installer via la commande suivante :
 pip install pandas
 ```
 
-#### Exécutez le script convert_parquet_to_csv.py :
+#### Exécutez le script `convert_parquet_to_csv.py` :
 ```bash
 python convert_parquet_to_csv.py
 ```
 Ce script effectue les étapes suivantes :
-- Charge le fichier Parquet (log_export.parquet).
+- Charge le fichier Parquet (`log_export.parquet`).
 - Convertit les colonnes nécessaires (notamment les colonnes de ports) pour qu'elles soient compatibles avec la base de données PostgreSQL.
-- Sauvegarde le fichier converti sous le nom log_export.csv dans le répertoire donnees_exemple/.
+- Sauvegarde le fichier converti sous le nom `log_export`.csv dans le répertoire `donnees_exemple/`.
 - Supprime le fichier parquet
 
 
@@ -50,7 +50,7 @@ Dans le répertoire du projet, exécutez la commande suivante pour construire le
 docker-compose up --build -d
 ```
 Cette commande va :
-- Construire les images Docker spécifiées dans le fichier docker-compose.yml.
+- Construire les images Docker spécifiées dans le fichier `docker-compose.yml`.
 - Démarrer les conteneurs pour PostgreSQL et l'application Streamlit.
 
 ### 4. Vérification du démarrage des conteneurs
@@ -59,7 +59,7 @@ Pour vérifier que tout fonctionne correctement, vous pouvez exécuter la comman
 ```bash
 docker-compose ps
 ```
-Assurez-vous que tous les conteneurs sont en cours d'exécution. En particulier, le conteneur PostgreSQL (nommé DBPostgres) et le conteneur Streamlit (nommé client) doivent être en état "Up".
+Assurez-vous que tous les conteneurs sont en cours d'exécution. En particulier, le conteneur PostgreSQL (nommé `DBPostgres`) et le conteneur Streamlit (nommé `client`) doivent être en état "Up".
 
 ### 5. Accéder à l'application Streamlit
 Une fois les conteneurs démarrés, vous pouvez accéder à votre application Streamlit via votre navigateur à l'adresse suivante :
