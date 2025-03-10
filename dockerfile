@@ -5,9 +5,9 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install some additional packages and update essential packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential && \
-    rm -rf /var/lib/apt/lists/* # Clean up to reduce the image size
+RUN apt-get update && apt-get install -y \
+    libpq-dev gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements.txt file into the container
 COPY requirements.txt .

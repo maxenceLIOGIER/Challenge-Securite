@@ -1,4 +1,5 @@
-import sqlite3
+import psycopg2
+import time
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -24,8 +25,31 @@ def stat_des_page():
     st.write("Permet de filtrer les données par plages de dates, types de flux, etc.")
 
     # Se connecter à la base de données SQLite
-    conn = sqlite3.connect("logs_test.db")
-    query = "SELECT * FROM logs ORDER BY RANDOM() LIMIT 100000;"  # on échantillonne pour des raisons de performance
+    MAX_RETRIES = 10  # Nombre maximum de tentatives
+    WAIT_SECONDS = 2  # Temps d'attente entre chaque tentative
+
+    for i in range(MAX_RETRIES):
+        try:
+            conn = psycopg2.connect(
+                host="postgres",
+                database="challenge_secu",
+                user="admin",
+                password="admin",
+                port=5432,
+            )
+            print("Connexion réussie à PostgreSQL !")
+            break  # Sort de la boucle dès que la connexion est établie
+        except psycopg2.OperationalError:
+            st.write(
+                f"🔄 Tentative {i+1}/{MAX_RETRIES} : PostgreSQL n'est pas encore prêt..."
+            )
+            time.sleep(WAIT_SECONDS)
+    else:
+        st.write("Impossible de se connecter à PostgreSQL après plusieurs tentatives.")
+        exit(1)
+
+    query = "SELECT * FROM logs ORDER BY RANDOM() LIMIT 100000;"
+    # on échantillonne pour des raisons de performance
     df = pd.read_sql_query(query, conn)
     conn.close()
 
