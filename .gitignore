@@ -2,3 +2,4 @@ venv_CS
 EDA.ipynb
 data
 .DS_Store
+views/__pycache__
