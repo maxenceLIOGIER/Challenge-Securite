@@ -25,7 +25,7 @@ def stat_des_page():
 
     # Se connecter à la base de données SQLite
     conn = sqlite3.connect("logs_test.db")
-    query = "SELECT * FROM logs ORDER BY RANDOM() LIMIT 10000;"  # on échantillonne pour des raisons de performance
+    query = "SELECT * FROM logs ORDER BY RANDOM() LIMIT 100000;"  # on échantillonne pour des raisons de performance
     df = pd.read_sql_query(query, conn)
     conn.close()
 
