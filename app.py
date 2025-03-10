@@ -26,7 +26,7 @@ with st.sidebar:
             "Statistiques Descriptives",
             "Machine Learning",
         ],
-        icons=["house", "chart-line", "table", "robot"],
+        icons=["house", "bar-chart", "table", "robot"],
         default_index=0,
         # orientation="horizontal",
     )
