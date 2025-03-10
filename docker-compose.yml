@@ -14,7 +14,7 @@ services:
       - ./donnees_exemple/log_export.csv:/data/log_export.csv
       - ./donnees_exemple/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d challenge_secu"]
       interval: 10s
       timeout: 5s
       retries: 5

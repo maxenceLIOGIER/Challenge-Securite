@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 
 from views.home import home_page
-from views.dashboard import dashboard_page
+from views.exploration import exploration_page
 from views.stat_des import stat_des_page
 from views.ml import ml_page
 
@@ -22,19 +22,18 @@ with st.sidebar:
         menu_title="",
         options=[
             "Accueil",
-            "Dashboard",
+            "Exploration des Données",
             "Statistiques Descriptives",
             "Machine Learning",
         ],
-        icons=["house", "bar-chart", "table", "robot"],
+        icons=["house", "search", "bar-chart", "robot"],
         default_index=0,
-        # orientation="horizontal",
     )
 
 if selected == "Accueil":
     home_page()
-elif selected == "Dashboard":
-    dashboard_page()
+if selected == "Exploration des Données":
+    exploration_page()
 elif selected == "Statistiques Descriptives":
     stat_des_page()
 elif selected == "Machine Learning":
