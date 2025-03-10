@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: DBPostgres
+    image: postgres:latest
+    ports:
+      - "32001:5432"
+    environment:
+      POSTGRES_DB: challenge_secu
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ./donnees_exemple/log_export.csv:/data/log_export.csv
+      - ./donnees_exemple/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  client:
+    image: app-client
+    build:
+      dockerfile: Dockerfile
+    container_name: client
+    ports:
+      - "8502:8502"
+    environment:
+      DOCKER_ENV: true
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DBNAME: challenge_secu
+      POSTGRES_PORT: 5432
+      SQLITE_PATH: logs_test.db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

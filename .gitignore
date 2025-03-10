@@ -4,3 +4,4 @@ data
 .DS_Store
 views/__pycache__
 logs_test.db
+log_export.csv
