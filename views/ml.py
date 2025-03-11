@@ -17,13 +17,34 @@ def ml_page():
     """
 
     # Connexion à la base de données PostgreSQL
-    # def get_db_connection():
-    #     engine = create_engine("postgresql://user:password@host:port/database")  # Remplace par tes identifiants
-    #     return engine
-
     def load_data():
-        data=pd.read_csv("donnees_finales/logs_processed.csv")
-        data['date'] = pd.to_datetime(data['date'], errors='coerce')
+        MAX_RETRIES = 10  # Nombre maximum de tentatives
+        WAIT_SECONDS = 4  # Temps d'attente entre chaque tentative
+
+        for i in range(MAX_RETRIES):
+            try:
+                conn = psycopg2.connect(
+                    host="postgres",
+                    database="challenge_secu",
+                    user="admin",
+                    password="admin",
+                    port=5432,
+                )
+                print("Connexion réussie à PostgreSQL !")
+                break  # Sort de la boucle dès que la connexion est établie
+            except psycopg2.OperationalError:
+                st.write(
+                    f"🔄 Tentative {i+1}/{MAX_RETRIES} : PostgreSQL n'est pas encore prêt..."
+                )
+                time.sleep(WAIT_SECONDS)
+        else:
+            st.write("Impossible de se connecter à PostgreSQL après plusieurs tentatives.")
+            exit(1)
+
+        query = "SELECT * FROM logs"
+
+        data = pl.read_database(query=query, connection=conn)
+        
         return data
 
     #Chargement des données 
