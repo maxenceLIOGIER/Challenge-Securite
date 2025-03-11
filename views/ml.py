@@ -4,7 +4,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
 from sqlalchemy import create_engine
+from src.preprocessing import PreProcessing
+from src.clustering import AnomalyClustering
 
+#Initialisation 
+prepro = PreProcessing()
+models = AnomalyClustering()
 
 def ml_page():
     """
@@ -17,12 +22,22 @@ def ml_page():
     #     return engine
 
     def load_data():
-        data=pd.read_csv("/Users/pierrebourbon/Documents/GitHub/Challenge-Securite/data_final.csv")
-        #data = data.drop(columns=['interface_out', 'divers'])
+        data=pd.read_csv("donnees_finales/data_final.csv")
         data['date'] = pd.to_datetime(data['date'], errors='coerce')
         return data
 
-    data = load_data()
+    #Chargement des données 
+    data_brut = load_data()
+
+    #Prétraitement des données 
+    data_encode = prepro.preprocess(data_brut)
+
+    #Prédiction des modèles 
+    preds = models.fit(data_encode)
+
+    #Concat data et preds 
+    data = pd.concat([data_brut, preds], axis=1)
+
     st.title("Analyse des Logs avec Machine Learning")
 
     def display_isolation_forest_results():
