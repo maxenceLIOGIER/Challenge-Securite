@@ -92,14 +92,14 @@ def exploration_page():
     df_grouped["ip_num"] = df_grouped["ipsrc"].apply(ip_to_int)
     df_grouped = df_grouped.sort_values("ip_num")
 
-    st.write("Histogramme des occurrences des IP sources, selon l'action")
+    # Histogramme des occurrences des IP sources, selon l'action
     couleurs = {"PERMIT": "blue", "DENY": "red"}
     fig = px.bar(
         df_grouped,
         x="ipsrc",
         y="count",
         color="action",
-        title="Nombre d'opérations par IP source",
+        title="Nombre d'opérations par IP source, selon l'action",
         labels={
             "ipsrc": "IP Source",
             "count": "Nombre d'opérations",

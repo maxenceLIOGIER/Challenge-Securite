@@ -1,6 +1,8 @@
 pandas==2.2.3
 plotly==6.0.0
+polars==1.24.0
 psycopg2==2.9.10
+scikit_learn==1.6.1
 seaborn==0.13.2
 SQLAlchemy==2.0.38
 streamlit==1.43.1
