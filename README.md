@@ -48,7 +48,7 @@ cd votre-repository
 ```
 
 ### 2. Convertir le fichier parquet en csv
-Si vous avez un fichier Parquet contenant des données (`log_export.parquet`), **et si vous n'avez pas son équivalent csv**, vous devrez le convertir en CSV afin de l'utiliser pour initialiser votre base de données PostgreSQL ou pour d'autres analyses. Le script de conversion est déjà créé.
+Si vous avez un fichier Parquet contenant des données (`logs_processed.parquet`), **et si vous n'avez pas son équivalent csv**, vous devrez le convertir en CSV afin de l'utiliser pour initialiser votre base de données PostgreSQL ou pour d'autres analyses. Le script de conversion est déjà créé.
 
 #### Assurez vous d'avoir installé pandas et os
 Vous pouvez l'installer via la commande suivante :
