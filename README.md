@@ -4,7 +4,8 @@
 
 Cette application permet d'analyser des logs issus d'une simulation d'attaques. Vous retrouverez plusieurs pages vous permettant d'analyser les données sous différents angles et à différents niveaux de granularité. Cette application se veut interactive et permet à n'importe quel utilisateur de naviguer lui même et de faire ses propres analyses. 
 
-L'application est oragnisé comme suit : 
+L'application est organisée comme suit : 
+
 * Une page **Acceuil**
     * Cette page détaille les fonctionnalités de l'application ainsi que ces objectifs.
 
