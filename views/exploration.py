@@ -4,8 +4,7 @@ import ipaddress
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
-# import plotly.graph_objects as go
+import plotly.graph_objects as go
 
 
 def ip_to_int(ip):
@@ -22,14 +21,7 @@ def exploration_page():
     """
     Renders the Data Exploration page
     """
-    st.markdown("# Page exploration résumant les stats principales")
-
-    st.write("Tableau de données")
-    st.write("Visualisation interactive des données")
-    st.write(
-        "IP source avec le nombre d’occurrences de destination contactées, incluant le nombre de flux rejetés et autorisés"
-    )
-    st.write("Globalement : Tableau, graphs et filtres")
+    st.markdown("# Page d'exploration résumant les trafics réseau")
 
     MAX_RETRIES = 10  # Nombre maximum de tentatives
     WAIT_SECONDS = 4  # Temps d'attente entre chaque tentative
@@ -55,23 +47,25 @@ def exploration_page():
         exit(1)
 
     # Récupération des IPs uniques pour aider l'utilisateur à filtrer
-    query_ips = "SELECT DISTINCT ipsrc FROM logs LIMIT 1000;"
+    query_ips = "SELECT DISTINCT ipsrc FROM logs;"
     df_ips = pd.read_sql_query(query_ips, conn)
 
     # st.write(df_ips.shape)
     # st.write(df_ips)
-    
+
     # st.write(df_ips["ipsrc"].str.split(".", expand=True).shape)
 
-    df_ips[["octet1", "octet2", "octet3", "octet4"]] = df_ips["ipsrc"].str.split(".", expand=True)
-    select1 = df_ips.loc[:,"octet1"].unique()
-    select2 = df_ips.loc[:,"octet2"].unique()
-    select3 = df_ips.loc[:,"octet3"].unique()
-    select4 = df_ips.loc[:,"octet4"].unique()
+    df_ips[["octet1", "octet2", "octet3", "octet4"]] = df_ips["ipsrc"].str.split(
+        ".", expand=True
+    )
+    select1 = df_ips.loc[:, "octet1"].unique()
+    select2 = df_ips.loc[:, "octet2"].unique()
+    select3 = df_ips.loc[:, "octet3"].unique()
+    select4 = df_ips.loc[:, "octet4"].unique()
     st.write("Filtres avancés")
     st.write("Début de la plage IP")
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         octet1s = st.selectbox("Octet1", select1)
     with col2:
@@ -92,36 +86,17 @@ def exploration_page():
     with col8:
         octet4f = st.selectbox("Octet 4", select4)
 
-    # ip_list = sorted(df_ips["ipsrc"].tolist())  # Trier les IPs pour l'affichage
-    # col1, col2 = st.columns(2)
-    # start_ip = col1.selectbox("IP de début", ip_list, index=0)
-    # end_ip = col2.selectbox("IP de fin", ip_list, index=len(ip_list) - 1)
-    
-    # df_ips["ip_num"] = df_ips["ipsrc"].apply(ip_to_int)
-    # start_ip, end_ip = df_ips["ip_num"].min(), df_ips["ip_num"].max()
-    # start_ip_num, end_ip_num = st.slider(
-    #     "Sélectionnez une plage d'IP",
-    #     min_value=start_ip,
-    #     max_value=end_ip,
-    #     value=(start_ip, end_ip),
-    #     format="%d",
-    # )
-    # ip_start, ip_end = int_to_ip(start_ip_num), int_to_ip(end_ip_num)
-
-
-
-
     query = f"""
     SELECT * FROM logs
-    WHERE ipsrc BETWEEN '{octet1s}.{octet2s}.{octet3s}.{octet4s}' AND '{octet1f}.{octet2f}.{octet3f}.{octet4f}'
-    ORDER BY RANDOM()
-    LIMIT 1000;
+    WHERE ipsrc BETWEEN '{octet1s}.{octet2s}.{octet3s}.{octet4s}' AND '{octet1f}.{octet2f}.{octet3f}.{octet4f}';
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
 
     st.write("Tableau de données")
     st.dataframe(df)
+
+    # --------------
 
     # groupby ipsrc et action
     df_grouped = df.groupby(["ipsrc", "action"]).size().reset_index(name="count")
@@ -144,4 +119,74 @@ def exploration_page():
         barmode="stack",  # Mode empilé
         color_discrete_map=couleurs,
     )
+
+    # --------------
+
+    df_counted = df.groupby(["ipsrc", "ipdst"]).size().reset_index(name="count")
+
+    unique_ips = list(set(df_counted["ipsrc"].tolist() + df_counted["ipdst"].tolist()))
+
+    node_map = {ip: idx for idx, ip in enumerate(unique_ips)}
+
+    df_counted["source_index"] = df_counted["ipsrc"].map(node_map)
+    df_counted["target_index"] = df_counted["ipdst"].map(node_map)
+
+    sankey1 = go.Figure(
+        go.Sankey(
+            textfont=dict(color="white", size=14),
+            node=dict(
+                pad=20,
+                thickness=30,
+                line=dict(color="black", width=0.5),
+                label=unique_ips,
+            ),
+            link=dict(
+                source=df_counted["source_index"],
+                target=df_counted["target_index"],
+                value=df_counted["count"],
+            ),
+        )
+    )
+    sankey1.update_layout(
+        title_text="Trafic entre IP Source et IP Destination", font_size=10, height=800
+    )
+
+    # ---------------
+
+    df_counted = df.groupby(["ipsrc", "portdst_range"]).size().reset_index(name="count")
+
+    unique_ips = list(set(df_counted["ipsrc"].tolist()))
+    unique_ports = list(set(df_counted["portdst_range"].tolist()))
+
+    node_map = {ip: idx for idx, ip in enumerate(unique_ips)}
+    node_map.update(
+        {port: idx + len(unique_ips) for idx, port in enumerate(unique_ports)}
+    )
+
+    df_counted["source_index"] = df_counted["ipsrc"].map(node_map)
+    df_counted["target_index"] = df_counted["portdst_range"].map(node_map)
+    sankey2 = go.Figure(
+        go.Sankey(
+            textfont=dict(color="white", size=14),
+            node=dict(
+                label=unique_ips + unique_ports,
+                pad=20,
+                thickness=20,
+            ),
+            link=dict(
+                source=df_counted["source_index"],
+                target=df_counted["target_index"],
+                value=df_counted["count"],
+            ),
+        )
+    )
+
+    sankey2.update_layout(
+        title_text="Trafic entre IP Source et Port Destination",
+        font_size=10,
+        height=800,
+    )
+
     st.plotly_chart(fig)
+    st.plotly_chart(sankey1)
+    st.plotly_chart(sankey2)

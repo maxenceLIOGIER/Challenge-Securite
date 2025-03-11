@@ -22,7 +22,7 @@ with st.sidebar:
         menu_title="",
         options=[
             "Accueil",
-            "Exploration des Données",
+            "Exploration des Trafics",
             "Statistiques Descriptives",
             "Machine Learning",
         ],
@@ -32,7 +32,7 @@ with st.sidebar:
 
 if selected == "Accueil":
     home_page()
-if selected == "Exploration des Données":
+if selected == "Exploration des Trafics":
     exploration_page()
 elif selected == "Statistiques Descriptives":
     stat_des_page()

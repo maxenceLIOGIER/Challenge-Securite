@@ -7,13 +7,12 @@ import plotly.express as px
 import polars as pl
 
 
-
 def stat_des_page():
     """
     Renders the Descriptive Statistics page
     """
+    st.markdown("# Page de statistiques descriptives")
 
-    
     MAX_RETRIES = 10  # Nombre maximum de tentatives
     WAIT_SECONDS = 4  # Temps d'attente entre chaque tentative
 
@@ -38,34 +37,7 @@ def stat_des_page():
         exit(1)
 
     query = "SELECT * FROM logs"
-
-    data = pl.read_database(query=query, connection=conn)
-
-
-
-    st.markdown("# Page de statistiques descriptives")
-
-    data = data.with_columns(
-        year=data["date"].dt.year().cast(pl.Utf8),
-        month=data["date"].dt.month().cast(pl.Utf8),
-        day=data["date"].dt.day().cast(pl.Utf8),
-        timestamp=data["date"].dt.time(),
-        rule=data["rule"].cast(pl.Utf8),
-        portsrc_range=data["portsrc"]
-        .map_elements(
-            lambda x: (
-                "well-known" if x < 1024 else "Registered" if x < 49152 else "Dynamic"
-            )
-        )
-        .alias("portsrc_range"),
-        portdst_range=data["portdst"]
-        .map_elements(
-            lambda x: (
-                "well-known" if x < 1024 else "Registered" if x < 49152 else "Dynamic"
-            )
-        )
-        .alias("portdst_range"),
-    )
+    data = pl.read_database(query, conn)
 
     st.write(data.head())
 
@@ -75,7 +47,12 @@ def stat_des_page():
     categories = counts["action"]
     values = counts["count"]
     fig_actions = px.pie(
-        counts, names=categories, values=values, title="Répartition des actions"
+        counts,
+        names=categories,
+        values=values,
+        color=categories,
+        title="Répartition des actions",
+        color_discrete_map={"PERMIT": "blue", "DENY": "red"},
     )
 
     # ----------------------
@@ -115,6 +92,7 @@ def stat_des_page():
         barmode="stack",
         text="portdst_range",
         title="Distribution accès en fonction des règles, de l'action et du type de port(RC6056).",
+        color_discrete_map={"PERMIT": "blue", "DENY": "red"},
     )
 
     # ----------------------
@@ -124,13 +102,14 @@ def stat_des_page():
     df_pandas = df_grouped.to_pandas()
     df_pandas = df_pandas.sort_values("date")
 
-    traffic_par_heure = px.line(
+    trafic_par_heure = px.line(
         df_pandas,
         x="date",
         y="count",
         color="action",
         markers=True,
-        title="Traffic en fonction de l'heure",
+        title="Trafic en fonction de l'heure",
+        color_discrete_map={"PERMIT": "blue", "DENY": "red"},
     )
 
     # ----------------------
@@ -161,76 +140,6 @@ def stat_des_page():
         z="count",
         color_continuous_scale="reds",
         title="Nombre de Hit en fonction de l'IP source et du port distant",
-    )
-
-    # --------------
-
-    df_pandas = data.to_pandas()
-    df_counted = df_pandas.groupby(["ipsrc", "ipdst"]).size().reset_index(name="count")
-
-    unique_ips = list(set(df_counted["ipsrc"].tolist() + df_counted["ipdst"].tolist()))
-
-    node_map = {ip: idx for idx, ip in enumerate(unique_ips)}
-
-    df_counted["source_index"] = df_counted["ipsrc"].map(node_map)
-    df_counted["target_index"] = df_counted["ipdst"].map(node_map)
-
-    sankey1 = go.Figure(
-        go.Sankey(
-            textfont=dict(color="white", size=14),
-            node=dict(
-                pad=20,
-                thickness=30,
-                line=dict(color="black", width=0.5),
-                label=unique_ips,
-            ),
-            link=dict(
-                source=df_counted["source_index"],
-                target=df_counted["target_index"],
-                value=df_counted["count"],
-            ),
-        )
-    )
-    sankey1.update_layout(
-        title_text="Traffic entre IP Source et IP Destination", font_size=10, height=800
-    )
-
-    # ---------------
-
-    df_counted = (
-        df_pandas.groupby(["ipsrc", "portdst_range"]).size().reset_index(name="count")
-    )
-
-    unique_ips = list(set(df_counted["ipsrc"].tolist()))
-    unique_ports = list(set(df_counted["portdst_range"].tolist()))
-
-    node_map = {ip: idx for idx, ip in enumerate(unique_ips)}
-    node_map.update(
-        {port: idx + len(unique_ips) for idx, port in enumerate(unique_ports)}
-    )
-
-    df_counted["source_index"] = df_counted["ipsrc"].map(node_map)
-    df_counted["target_index"] = df_counted["portdst_range"].map(node_map)
-    sankey2 = go.Figure(
-        go.Sankey(
-            textfont=dict(color="white", size=14),
-            node=dict(
-                label=unique_ips + unique_ports,
-                pad=20,
-                thickness=20,
-            ),
-            link=dict(
-                source=df_counted["source_index"],
-                target=df_counted["target_index"],
-                value=df_counted["count"],
-            ),
-        )
-    )
-
-    sankey2.update_layout(
-        title_text="Traffic entre Source IP et Destination Port",
-        font_size=10,
-        height=800,
     )
 
     # ----------------------
@@ -307,10 +216,11 @@ def stat_des_page():
         rules,
         x="ipsrc_class",  # Grouping by 'rule'
         y="count",  # Y-axis: Count of occurrences
-        color="isprivatesrc",  # Color by action type (e.g., allow/deny)
+        color="action",  # Color by action type (e.g., allow/deny)
         barmode="stack",
-        text="action",
-        title="Distribution actions en fonction des classes IP, de l'action et de la nature du réseau.",
+        text="isprivatesrc",
+        title="Actions en fonction des classes IP (TCP)",
+        color_discrete_map={"PERMIT": "blue", "DENY": "red"},
     )
 
     # ----------------------
@@ -356,10 +266,11 @@ def stat_des_page():
         rules,
         x="ipsrc_class",  # Grouping by 'rule'
         y="count",  # Y-axis: Count of occurrences
-        color="isprivatesrc",  # Color by action type (e.g., allow/deny)
+        color="action",  # Color by action type (e.g., allow/deny)
         barmode="stack",
-        text="action",
-        title="Distribution actions en fonction des classes IP, de l'action et de la nature du réseau.",
+        text="isprivatesrc",
+        title="Actions en fonction des classes IP (UDP)",
+        color_discrete_map={"PERMIT": "blue", "DENY": "red"},
     )
 
     # ----------------------
@@ -368,22 +279,20 @@ def stat_des_page():
     col1, col2 = st.columns(2)
     with col1:
         st.plotly_chart(rules_most_used)
-        st.plotly_chart(top5TCPrules)
-        st.plotly_chart(top10UDPrules)
-
-    with col2:
-        st.plotly_chart(fig_actions)
         st.plotly_chart(heatmap1)
-        st.plotly_chart(heatmap2)
-        st.plotly_chart(TCP_bar1)
-        st.plotly_chart(TCP_bar2)
-        st.plotly_chart(TCP_bar3)
+        st.plotly_chart(top10UDPrules)
         st.plotly_chart(UDP_bar1)
         st.plotly_chart(UDP_bar2)
         st.plotly_chart(UDP_bar3)
 
+    with col2:
+        st.plotly_chart(fig_actions)
+        st.plotly_chart(heatmap2)
+        st.plotly_chart(top5TCPrules)
+        st.plotly_chart(TCP_bar1)
+        st.plotly_chart(TCP_bar2)
+        st.plotly_chart(TCP_bar3)
+
     st.plotly_chart(distribution1)
-    st.plotly_chart(traffic_par_heure)
-    st.plotly_chart(sankey1)
-    st.plotly_chart(sankey2)
+    st.plotly_chart(trafic_par_heure)
     st.plotly_chart(sankey3)
