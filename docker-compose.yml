@@ -11,8 +11,8 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     volumes:
-      - ./donnees_exemple/log_export.csv:/data/log_export.csv
-      - ./donnees_exemple/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./donnees_finales/logs_processed.csv:/data/log_export.csv
+      - ./donnees_finales/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d challenge_secu"]
       interval: 10s

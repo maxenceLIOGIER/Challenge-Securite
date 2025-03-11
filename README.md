@@ -37,9 +37,9 @@ pip install pandas os
 python convert_parquet_to_csv.py
 ```
 Ce script effectue les étapes suivantes :
-- Charge le fichier Parquet (`log_export.parquet`).
+- Charge le fichier Parquet (`logs_processed.parquet`).
 - Convertit les colonnes nécessaires (notamment les colonnes de ports) pour qu'elles soient compatibles avec la base de données PostgreSQL.
-- Sauvegarde le fichier converti sous le nom `log_export`.csv dans le répertoire `donnees_exemple/`.
+- Sauvegarde le fichier converti sous le nom `logs_processed.csv` dans le répertoire `donnees_finales/`.
 - Supprime le fichier parquet
 
 
