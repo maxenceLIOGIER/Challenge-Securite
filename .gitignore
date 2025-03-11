@@ -5,3 +5,4 @@ data
 views/__pycache__
 logs_test.db
 log_export.csv
+src/__pycache__
