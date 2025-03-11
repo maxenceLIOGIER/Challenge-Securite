@@ -121,24 +121,6 @@ def ml_page():
         fig = px.sunburst(filtered_data, path=["ipsrc", "ipdst", "portdst"], values=None, title="Flux réseau suspect")
         st.plotly_chart(fig)
 
-        # Évolution des actions "Permit" et "Deny" dans le temps
-        st.subheader("Évolution des actions dans le temps")
-        filtered_tcp = filtered_data[filtered_data["proto"] == "TCP"]
-        time_series = filtered_tcp.groupby([filtered_tcp["date"].dt.minute, "action"]).size().unstack().fillna(0)
-        
-        fig = go.Figure()
-        if "Permit" in time_series.columns:
-            fig.add_trace(go.Scatter(x=time_series.index, y=time_series["Permit"], mode='lines', name='Permit', line=dict(color='blue')))
-        if "Deny" in time_series.columns:
-            fig.add_trace(go.Scatter(x=time_series.index, y=time_series["Deny"], mode='lines', name='Deny', line=dict(color='orange')))
-        
-        fig.update_layout(title="Nombre d'actions 'Permit' et 'Deny' par minute",
-                          xaxis_title="Minute",
-                          yaxis_title="Nombre de Hits",
-                          legend=dict(x=0.8, y=1))
-        
-        st.plotly_chart(fig)
-    
     display_isolation_forest_results()
     display_dbscan_results()
     cross_analysis()
