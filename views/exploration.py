@@ -58,26 +58,62 @@ def exploration_page():
     query_ips = "SELECT DISTINCT ipsrc FROM logs LIMIT 1000;"
     df_ips = pd.read_sql_query(query_ips, conn)
 
+    # st.write(df_ips.shape)
+    # st.write(df_ips)
+    
+    # st.write(df_ips["ipsrc"].str.split(".", expand=True).shape)
+
+    df_ips[["octet1", "octet2", "octet3", "octet4"]] = df_ips["ipsrc"].str.split(".", expand=True)
+    select1 = df_ips.loc[:,"octet1"].unique()
+    select2 = df_ips.loc[:,"octet2"].unique()
+    select3 = df_ips.loc[:,"octet3"].unique()
+    select4 = df_ips.loc[:,"octet4"].unique()
     st.write("Filtres avancés")
+    st.write("Début de la plage IP")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        octet1s = st.selectbox("Octet1", select1)
+    with col2:
+        octet2s = st.selectbox("Octet2", select2)
+    with col3:
+        octet3s = st.selectbox("Octet3", select3)
+    with col4:
+        octet4s = st.selectbox("Octet4", select4)
+
+    st.write("Fin de la plage IP")
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        octet1f = st.selectbox("Octet 1", select1)
+    with col6:
+        octet2f = st.selectbox("Octet 2", select2)
+    with col7:
+        octet3f = st.selectbox("Octet 3", select3)
+    with col8:
+        octet4f = st.selectbox("Octet 4", select4)
+
     # ip_list = sorted(df_ips["ipsrc"].tolist())  # Trier les IPs pour l'affichage
     # col1, col2 = st.columns(2)
     # start_ip = col1.selectbox("IP de début", ip_list, index=0)
     # end_ip = col2.selectbox("IP de fin", ip_list, index=len(ip_list) - 1)
+    
+    # df_ips["ip_num"] = df_ips["ipsrc"].apply(ip_to_int)
+    # start_ip, end_ip = df_ips["ip_num"].min(), df_ips["ip_num"].max()
+    # start_ip_num, end_ip_num = st.slider(
+    #     "Sélectionnez une plage d'IP",
+    #     min_value=start_ip,
+    #     max_value=end_ip,
+    #     value=(start_ip, end_ip),
+    #     format="%d",
+    # )
+    # ip_start, ip_end = int_to_ip(start_ip_num), int_to_ip(end_ip_num)
 
-    df_ips["ip_num"] = df_ips["ipsrc"].apply(ip_to_int)
-    start_ip, end_ip = df_ips["ip_num"].min(), df_ips["ip_num"].max()
-    start_ip_num, end_ip_num = st.slider(
-        "Sélectionnez une plage d'IP",
-        min_value=start_ip,
-        max_value=end_ip,
-        value=(start_ip, end_ip),
-        format="%d",
-    )
-    ip_start, ip_end = int_to_ip(start_ip_num), int_to_ip(end_ip_num)
+
+
 
     query = f"""
     SELECT * FROM logs
-    WHERE ipsrc BETWEEN '{ip_start}' AND '{ip_end}'
+    WHERE ipsrc BETWEEN '{octet1s}.{octet2s}.{octet3s}.{octet4s}' AND '{octet1f}.{octet2f}.{octet3f}.{octet4f}'
     ORDER BY RANDOM()
     LIMIT 1000;
     """
