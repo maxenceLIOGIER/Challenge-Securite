@@ -110,7 +110,7 @@ def ml_page():
 
         # Diagramme en cordes pour visualiser les connexions
         st.subheader("Visualisation des connexions entre IPs et ports")
-        fig = px.sunburst(filtered_data, path=["ipsrc", "ipdst", "portdst"], values=None, title="Flux réseau suspect")
+        fig = px.sunburst(filtered_data, path=["ipsrc", "portdst"], values=None, title="Flux réseau suspect")
         st.plotly_chart(fig)
 
     display_isolation_forest_results()
