@@ -18,10 +18,6 @@ def home_page():
     st.write(
         """
     La page *Exploration* vous permet de naviguer directement dans une table de logs, avec des filtres et des options de recherche pour vous aider à trouver rapidement ce que vous cherchez.
-
-    Vous y trouverez également des statistiques pratiques :
-    - Les **TOP 5 des IP sources les plus émettrices**.
-    - Les **TOP 10 des ports (inférieurs à 1024)** avec un accès autorisé.
     """
     )
 
@@ -30,6 +26,10 @@ def home_page():
     st.write(
         """
     La page *Statistiques Descriptives* permet d'approfondir l'analyse des logs. Vous y trouverez des visualisations avancées et des résumés statistiques pour vous aider à mieux comprendre les tendances et les comportements des utilisateurs dans vos logs.
+
+    Vous y trouverez également des statistiques pratiques :
+    - Les **TOP 5 des IP sources les plus émettrices**.
+    - Les **TOP 10 des ports (inférieurs à 1024)** avec un accès autorisé.
     """
     )
 
@@ -48,7 +48,7 @@ def home_page():
         """
     L'application est conçue pour être simple et intuitive. Chaque page vous guidera à travers les différentes étapes d'analyse.
 
-    1. **Commencez par la page d'exploration** pour naviguer dans vos logs et obtenir des statistiques de base.
+    1. **Commencez par la page d'exploration** pour naviguer dans vos logs, obtenir des statistiques de base et investiguer les trafics réseau.
     2. **Passez à la page des statistiques descriptives** pour des analyses plus poussées.
     3. **Enfin, entraînez vos modèles de Machine Learning** pour découvrir des comportements anormaux et appliquer des techniques d'auto-apprentissage sur vos logs.
     """
