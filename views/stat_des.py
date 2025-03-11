@@ -70,7 +70,7 @@ def stat_des_page():
     # )
 
     
-    data = pl.read_parquet(r"./data/log_parquet.parquet")
+    data = pl.read_parquet(r"data\logs_processed.parquet")
     data = data.with_columns(
         year = data["date"].dt.year().cast(pl.Utf8),
         month = data['date'].dt.month().cast(pl.Utf8),
@@ -249,24 +249,91 @@ def stat_des_page():
         height=800)
 
     #----------------------
+
+    # Group the data by 'ip_classification' and 'action' to get the count of occurrences
+    grouped_data = TCP.group_by(["isprivatesrc", "action"]).agg(pl.count())
+
+    # Convert the grouped data to Pandas for easy use in Plotly
+    grouped_data_pd = grouped_data.to_pandas()
+
+    # Create a dictionary for node labels
+    node_labels = ["Private", "Public", "Allow", "Deny"]
+
+    # Create the Sankey plot
+    sankey3 = go.Figure(go.Sankey(
+        textfont=dict(color="white", size=14),
+        node=dict(
+            pad=15,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=node_labels
+        ),
+        link=dict(
+            source=[0, 0, 1, 1],
+            target=[3,2,2,3],  # Indexes of the target nodes (Allow/Deny)
+            value=grouped_data_pd["count"].tolist()  # Link values are the counts
+        )
+    ))
+
+    # Update the layout for better display
+    sankey3.update_layout(title_text="Flux IP et action", font_size=10)
+
+    #----------------------
+
     
     TCP = data.filter(data["proto"] == "TCP")
     count = TCP.select(["action", "portsrc_range"]).group_by(["action", "portsrc_range"]).count()
-    bar1 = px.bar(count, x="action", y="count", color="portsrc_range", barmode="stack", title="action en fonction du port source (TCP)")
+    TCP_bar1 = px.bar(count, x="action", y="count", color="portsrc_range", barmode="stack", title="action en fonction du port source (TCP)")
 
-
+    #----------------------
 
     count = TCP.select(["action", "portdst_range"]).group_by(["action", "portdst_range"]).count()
-    bar2 = px.bar(count, x="action", y="count", color="portdst_range", barmode="stack", title="action en fonction du port destination (TCP)")
+    TCP_bar2 = px.bar(count, x="action", y="count", color="portdst_range", barmode="stack", title="action en fonction du port destination (TCP)")
+
+    #----------------------
+
+    rules = TCP.group_by(["ipsrc_class", "isprivatesrc", "action"]).agg(
+        pl.len().alias("count")
+    )
+    TCP_bar3 = px.bar(
+        rules,
+        x="ipsrc_class",       # Grouping by 'rule'
+        y="count",      # Y-axis: Count of occurrences
+        color="isprivatesrc", # Color by action type (e.g., allow/deny)
+        barmode="stack",
+        text="action",
+        title= "Distribution actions en fonction des classes IP, de l'action et de la nature du réseau."
+    )
+
+    #----------------------
 
     UDP = data.filter(data["proto"] == "UDP")
     count = UDP.select(["action", "portsrc_range"]).group_by(["action", "portsrc_range"]).count()
-    bar3 = px.bar(count, x="action", y="count", color="portsrc_range", barmode="stack", title="action en fonction du port source (UDP)")
+    UDP_bar1 = px.bar(count, x="action", y="count", color="portsrc_range", barmode="stack", title="action en fonction du port source (UDP)")
 
-
+    #----------------------
 
     count = UDP.select(["action", "portdst_range"]).group_by(["action", "portdst_range"]).count()
-    bar4 = px.bar(count, x="action", y="count", color="portdst_range", barmode="stack", title="action en fonction du port destination (UDP)")
+    UDP_bar2 = px.bar(count, x="action", y="count", color="portdst_range", barmode="stack", title="action en fonction du port destination (UDP)")
+
+    #----------------------
+
+    rules = UDP.group_by(["ipsrc_class", "isprivatesrc", "action"]).agg(
+        pl.len().alias("count")
+    )
+    
+    UDP_bar3 = px.bar(
+        rules,
+        x="ipsrc_class",       # Grouping by 'rule'
+        y="count",      # Y-axis: Count of occurrences
+        color="isprivatesrc", # Color by action type (e.g., allow/deny)
+        barmode="stack",
+        text="action",
+        title= "Distribution actions en fonction des classes IP, de l'action et de la nature du réseau."
+    )
+
+    #----------------------
+
 
     # Afficher les graphiques dans Streamlit côte à côte
     col1, col2 = st.columns(2)
@@ -279,13 +346,16 @@ def stat_des_page():
         st.plotly_chart(fig_actions)
         st.plotly_chart(heatmap1)
         st.plotly_chart(heatmap2)
-        st.plotly_chart(bar1)
-        st.plotly_chart(bar2)
-        st.plotly_chart(bar3)
-        st.plotly_chart(bar4)
+        st.plotly_chart(TCP_bar1)
+        st.plotly_chart(TCP_bar2)
+        st.plotly_chart(TCP_bar3)
+        st.plotly_chart(UDP_bar1)
+        st.plotly_chart(UDP_bar2)
+        st.plotly_chart(UDP_bar3)
     
     st.plotly_chart(distribution1)
     st.plotly_chart(traffic_par_heure)
     st.plotly_chart(sankey1)
     st.plotly_chart(sankey2)
+    st.plotly_chart(sankey3)
 
