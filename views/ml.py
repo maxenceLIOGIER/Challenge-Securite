@@ -6,6 +6,8 @@ import seaborn as sns
 from sqlalchemy import create_engine
 from src.preprocessing import PreProcessing
 from src.clustering import AnomalyClustering
+import psycopg2
+import polars as pl
 
 #Initialisation 
 prepro = PreProcessing()
@@ -45,14 +47,13 @@ def ml_page():
 
         data = pl.read_database(query=query, connection=conn)
         
-        return data
+        return data.to_pandas()
 
     #Chargement des données 
     data_brut = load_data()
-
     #Prétraitement des données 
     data_encode = prepro.preprocess(data_brut)
-
+    st.write(data_encode.head())
     #Prédiction des modèles 
     preds = models.fit(data_encode)
 
