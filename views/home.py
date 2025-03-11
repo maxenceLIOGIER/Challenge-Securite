@@ -8,16 +8,7 @@ def home_page():
     Renders the Home page.
     """
     # Titre principal
-    st.title("Bienvenue sur l'Application d'Analyse des Logs 🚀")
-
-    # Introduction
-    st.write("""
-    Bienvenue sur notre plateforme d'analyse de logs, conçue pour vous permettre d'explorer, d'analyser et de comprendre vos logs réseau de manière simple et intuitive.
-
-    Que vous soyez un professionnel de la cybersécurité, un analyste de données ou un développeur, cette application vous aidera à tirer des insights précieux à partir de vos données de logs. Découvrez les comportements des utilisateurs, identifiez les anomalies et effectuez des analyses approfondies grâce à des modèles de machine learning avancés.
-
-    Voici un aperçu des principales fonctionnalités de l'application :
-    """)
+    st.title("OPSISE - Data Science for Cybersecurity Experts")
 
     # Section des pages
     st.subheader("🚀 Naviguez facilement dans les sections de l'application :")
