@@ -1,8 +1,32 @@
 # Challenge-Securite
 
 ## Description de l'application
-[ à faire]
 
+Cette application permet d'analyser des logs issus d'une simulation d'attaques. Vous retrouverez plusieurs pages vous permettant d'analyser les données sous différents angles et à différents niveaux de granularité. Cette application se veut interactive et permet à n'importe quel utilisateur de naviguer lui même et de faire ses propres analyses. 
+
+L'application est organisée comme suit : 
+
+* Une page **Acceuil**
+    * Cette page détaille les fonctionnalités de l'application ainsi que ces objectifs.
+
+* Une page **Exploration des trafics** 
+    * Cette page vous permet de naviguer dans les différents trafics réseau. 
+
+* Une page **Statistiques Descriptives**
+    * Ici, vous pourrez retouver des tableaux de bords vous permettant des comprendre en profondeur les logs. Vous pourrez investiguer les différents régles, actions, protocole, IPs, sous différents angles grâce notamment à des filtres.
+
+* Une page **Machine Learning**
+    * Sur cette page, deux modèles de Machine Learning sont entrainés pour vous offrir plusieurs scénarios d'analyses. 
+        1. Isolation Forest : 
+        Permet de détecter les anomalies dans l'ensemble des logs. 
+
+        2. DBSCAN : 
+        Permet de détecter les différents comportements dans les logs réseaux 
+
+        3. Analyse croisés des résultats : 
+        Vous pourrez croiser vos résultats de ces 2 modèles pour apporfondir vos analyses. 
+
+Bonne naviguation !!!
 
 ### Prérequis
 
@@ -24,7 +48,7 @@ cd votre-repository
 ```
 
 ### 2. Convertir le fichier parquet en csv
-Si vous avez un fichier Parquet contenant des données (`log_export.parquet`), vous devrez le convertir en CSV afin de l'utiliser pour initialiser votre base de données PostgreSQL ou pour d'autres analyses. Le script de conversion est déjà créé.
+Si vous avez un fichier Parquet contenant des données (`logs_processed.parquet`), **et si vous n'avez pas son équivalent csv**, vous devrez le convertir en CSV afin de l'utiliser pour initialiser votre base de données PostgreSQL ou pour d'autres analyses. Le script de conversion est déjà créé.
 
 #### Assurez vous d'avoir installé pandas et os
 Vous pouvez l'installer via la commande suivante :
@@ -64,3 +88,9 @@ Assurez-vous que tous les conteneurs sont en cours d'exécution. En particulier,
 ### 5. Accéder à l'application Streamlit
 Une fois les conteneurs démarrés, vous pouvez accéder à votre application Streamlit via votre navigateur à l'adresse suivante :
 http://localhost:8502
+
+### 6. Nettoyage Docker
+A la fin de votre utilisation, pensez à nettoyer en utilisant la commande suivante :
+```bash
+docker-compose down -v
+```
