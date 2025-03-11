@@ -18,9 +18,9 @@ class AnomalyClustering:
         :return: DataFrame contenant les labels des clusters DBSCAN et les prédictions de l'Isolation Forest
         """
         # Entraînement Isolation Forest
-        data['IF_pred'] = self.model_IF.fit_predict(data)
+        data['isolation'] = self.model_IF.fit_predict(data)
 
         # Entraînement DBSCAN
-        data['DBSCAN_cluster'] = self.model_DB.fit_predict(data)
+        data['cluster'] = self.model_DB.fit_predict(data)
 
-        return data[['IF_pred', 'DBSCAN_cluster']]
+        return data[['isolation', 'cluster']]

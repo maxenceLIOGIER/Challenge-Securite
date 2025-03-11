@@ -55,7 +55,7 @@ class PreProcessing:
         data["year"] = data["year"].replace(2024, 2025)
 
         # Suppression des colonnes inutiles
-        data = self.drop_columns(data, ['interface_out', 'divers'])
+        data = self.drop_columns(data, ['timestamp','portsrc_range','portdst_range','hour','ipsrc_class','ipdst_class','isprivatesrc','isprivatedst'])
 
         # Suppression des lignes avec des valeurs manquantes
         data = self.drop_na(data)

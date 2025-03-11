@@ -22,7 +22,7 @@ def ml_page():
     #     return engine
 
     def load_data():
-        data=pd.read_csv("donnees_finales/data_final.csv")
+        data=pd.read_csv("donnees_finales/logs_processed.csv")
         data['date'] = pd.to_datetime(data['date'], errors='coerce')
         return data
 
@@ -67,16 +67,8 @@ def ml_page():
         st.plotly_chart(fig)
         st.markdown("<br><br>", unsafe_allow_html=True)
 
-    def time_series_visualization():
-        st.subheader("4 - Évolution des anomalies au fil du temps")
-        data_sorted = data.sort_values(by="date")
-        
-        fig = px.line(data_sorted, x="date", y="isolation", markers=True, title="Série temporelle des anomalies")
-        st.plotly_chart(fig)
-        st.markdown("<br><br>", unsafe_allow_html=True)
-
     def cluster_exploration():
-        st.subheader("5 - Exploration des clusters")
+        st.subheader("4 - Exploration des clusters")
         st.write("Cette analyse permet de comparer les résultats des deux méthodes et d'identifier les corrélations entre anomalies et clusters de comportement.")
         selected_cluster = st.selectbox("Sélectionner un cluster", sorted(data["cluster"].unique()))
         filtered_data = data[data["cluster"] == selected_cluster]
@@ -124,5 +116,4 @@ def ml_page():
     display_isolation_forest_results()
     display_dbscan_results()
     cross_analysis()
-    time_series_visualization()
     cluster_exploration()
