@@ -7,13 +7,44 @@ import plotly.express as px
 import polars as pl
 
 
+
 def stat_des_page():
     """
     Renders the Descriptive Statistics page
     """
+
+    
+    MAX_RETRIES = 10  # Nombre maximum de tentatives
+    WAIT_SECONDS = 4  # Temps d'attente entre chaque tentative
+
+    for i in range(MAX_RETRIES):
+        try:
+            conn = psycopg2.connect(
+                host="postgres",
+                database="challenge_secu",
+                user="admin",
+                password="admin",
+                port=5432,
+            )
+            print("Connexion réussie à PostgreSQL !")
+            break  # Sort de la boucle dès que la connexion est établie
+        except psycopg2.OperationalError:
+            st.write(
+                f"🔄 Tentative {i+1}/{MAX_RETRIES} : PostgreSQL n'est pas encore prêt..."
+            )
+            time.sleep(WAIT_SECONDS)
+    else:
+        st.write("Impossible de se connecter à PostgreSQL après plusieurs tentatives.")
+        exit(1)
+
+    query = "SELECT * FROM logs"
+
+    data = pl.read_database(query=query, connection=conn)
+
+
+
     st.markdown("# Page de statistiques descriptives")
 
-    data = pl.read_parquet(r"data\logs_processed.parquet")
     data = data.with_columns(
         year=data["date"].dt.year().cast(pl.Utf8),
         month=data["date"].dt.month().cast(pl.Utf8),
