@@ -89,4 +89,8 @@ Assurez-vous que tous les conteneurs sont en cours d'exécution. En particulier,
 Une fois les conteneurs démarrés, vous pouvez accéder à votre application Streamlit via votre navigateur à l'adresse suivante :
 http://localhost:8502
 
-
+### 6. Nettoyage Docker
+A la fin de votre utilisation, pensez à nettoyer en utilisant la commande suivante :
+```bash
+docker-compose down -v
+```
